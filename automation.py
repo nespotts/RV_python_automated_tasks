@@ -96,6 +96,9 @@ class Automation:
             if (time.time() - self.inverter_start_timer >= 10):
                 self.inverter_state = 3
 
+    def stateMachine(self):
+        pass
+
     def calc_load_current(self):
         battery_current = self.bms.battery['current']
         solar_current = self.solar.solar_data['battery_current']
