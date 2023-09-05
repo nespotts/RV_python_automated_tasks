@@ -9,6 +9,7 @@ class Automation:
         self.solar = solar
         self.water_heater_state = 0 # 0-off 3-on
         self.inverter_state = 0 # 0-off 1-starting 2-waiting on inverter 3-on
+        self.state = 0 # 0-inverter & WH off, 1-invert on WH off, 2-inverter on WH on, 3-inverter starting
         self.inverter_start_timer = 0
         self.state_timer = 0
         self.state_interval = 500
@@ -81,8 +82,8 @@ class Automation:
                 self.blynk.virtual_write('V73', 0)
 
     def manage_inverter(self):
-        inverter_switch = self.blynk.get_pin_val('V74')
         # sync states
+        inverter_switch = self.blynk.get_pin_val('V74')
         if (inverter_switch == 1 and self.inverter_state == 0):
             self.inverter_state = 3
         elif inverter_switch == 0 and self.inverter_state == 3:
@@ -97,7 +98,47 @@ class Automation:
                 self.inverter_state = 3
 
     def stateMachine(self):
-        pass
+        inverter_switch = self.blynk.get_pin_val('V74')
+        water_heater = self.blynk.get_pin_val('V73')
+        schedule = self.blynk.get_pin_val('V77').split("\x00")
+        soc = self.blynk.get_pin_val('V45')
+        soc_range = self.blynk.get_pin_val('V79').split("-")
+
+        min_hour = int(schedule[0]) // 3600
+        max_hour = int(schedule[1]) // 3600
+
+        soc_turn_on = float(soc_range[1])
+        soc_turn_off = float(soc_range[0])
+
+        utc = datetime.datetime.now() # UTC
+        eastern = pytz.timezone('US/Eastern')  # eastern timezone info
+        now = utc.astimezone(eastern)
+
+        # sync states
+        # 0-inverter & WH off, 1-inverter starting, 2-invert on WH off, 3-inverter on WH on, 
+
+        #  self.inverter_state = 0 # 0-off 1-starting 2-waiting on inverter 3-on
+        #  self.water_heater_state = 0 # 0-off 3-on
+        match self.state:
+            case 0: # inverter & WH off
+                # sync state
+                if inverter_switch == 1:
+                    self.state = 1
+                # check if it's time to turn on
+                elif (soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour):
+                    self.state = 1
+                    self.inverter_start_timer = time.time() # in seconds
+            case 1: # inverter starting
+                if (time.time() - self.inverter_start_timer >= 10):
+                    self.state = 2
+            case 2: # inverter on, WH off
+                if (soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour):
+                    self.state = 3
+                    self.blynk.virtual_write('V73', 1)
+            case 3: # inverter & WH on
+                if (soc <= soc_turn_off or now.hour < min_hour or now.hour >= max_hour):
+                    self.state = 2
+                    self.blynk.virtual_write('V73', 0)
 
     def calc_load_current(self):
         battery_current = self.bms.battery['current']
