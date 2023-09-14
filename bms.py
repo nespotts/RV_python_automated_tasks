@@ -52,35 +52,35 @@ class BMS:
         self.calcBatteryPower()
 
     def calcVoltage(self):
-        voltages = self.blynk.get_pin_vals(self.blynk_bms_pins['voltage'])
+        voltages = self.blynk.get_pin_vals(self.blynk_bms_pins['voltage'], "rv_battery")
         sum = 0
         for voltage in voltages:
             sum += voltage
         self.battery['voltage'] = round(sum/3, 3)
 
     def calcCurrent(self):
-        currents = self.blynk.get_pin_vals(self.blynk_bms_pins['current'])
+        currents = self.blynk.get_pin_vals(self.blynk_bms_pins['current'], "rv_battery")
         sum = 0
         for current in currents:
             sum += current
         self.battery['current'] = round(sum, 3)
 
     def calcStateOfCharge(self):
-        SOCs = self.blynk.get_pin_vals(self.blynk_bms_pins['state_of_charge'])
+        SOCs = self.blynk.get_pin_vals(self.blynk_bms_pins['state_of_charge'], "rv_battery")
         sum = 0
         for SOC in SOCs:
             sum += SOC
         self.battery['state_of_charge'] = round(sum, 3)
 
     def calcStateOfChargePercent(self):
-        SOCs = self.blynk.get_pin_vals(self.blynk_bms_pins['state_of_charge_percent'])
+        SOCs = self.blynk.get_pin_vals(self.blynk_bms_pins['state_of_charge_percent'], "rv_battery")
         sum = 0
         for SOC in SOCs:
             sum += SOC
         self.battery['state_of_charge_percent'] = round(sum/3, 3)
 
     def calcBatteryCapacity(self):
-        capacities = self.blynk.get_pin_vals(self.blynk_bms_pins['capacity'])
+        capacities = self.blynk.get_pin_vals(self.blynk_bms_pins['capacity'], "rv_battery")
         sum = 0
         for capacity in capacities:
             sum += capacity

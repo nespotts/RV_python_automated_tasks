@@ -4,14 +4,17 @@ import requests
 class Blynk:
 	def __init__(self):
 		self.endpoint = "https://blynk.cloud/external/api/"
-		self.token = "fkY_GzSnp2MVq31eh4iSj6UIne4-RFY0"
-		self.read_pins = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79]
-		self.pin_vals = {}
+		self.rv_brain_token = "fkY_GzSnp2MVq31eh4iSj6UIne4-RFY0"
+		self.rv_battery_token = "a58EO0MExXyF1byGFDbb-WmtsQw71bdW"
+		self.read_rv_brain_pins = [0,1,2,3,4,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79]
+		self.read_rv_battery_pins = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]
+		self.rv_brain_pin_vals = {}
+		self.rv_battery_pin_vals = {}
 		self.read_interval = 750
 		self.read_timer = 0
 
 	def virtual_write(self, pin, value):
-		url = self.endpoint + "update?token=" + self.token + "&" + str(pin) + "=" + str(value)
+		url = self.endpoint + "update?token=" + self.rv_brain_token + "&" + str(pin) + "=" + str(value)
 		# print(1)
 		response = requests.get(url=url)
 		# print(2)
@@ -24,7 +27,7 @@ class Blynk:
 			return 0
 		
 	def virtual_write_batch(self, pins, values):
-		url = self.endpoint + "batch/update?token=" + self.token
+		url = self.endpoint + "batch/update?token=" + self.rv_brain_token
 		for i in range(len(pins)):
 			pin_str = ""
 			if isinstance(pins[i], int):
@@ -51,7 +54,7 @@ class Blynk:
 		for pin in pins:
 			pin_list += "&V" + str(pin)
 
-		url = self.endpoint + "get?token=" + self.token + str(pin_list)
+		url = self.endpoint + "get?token=" + self.rv_brain_token + str(pin_list)
 		# print(3)
 		try:
 			response = requests.get(url=url, timeout=3)
@@ -70,7 +73,7 @@ class Blynk:
 		# print(4)
 
 	
-	def get_pin_vals(self, pins):
+	def get_pin_vals(self, pins, device="rv_battery"):
 		output = []
 		for pin in pins:
 			pin_str = ""
@@ -81,11 +84,15 @@ class Blynk:
 			else:
 				pin_str = pin
 			# print(pin_str, self.pin_vals)
-			output.append(self.pin_vals[pin_str])
+			if device == "rv_battery":
+				output.append(self.rv_battery_pin_vals[pin_str])
+			else:
+				output.append(self.rv_brain_pin_vals[pin_str])
+
 		return output
 	
 	
-	def get_pin_val(self, pin):
+	def get_pin_val(self, pin, device="rv_battery"):
 		pin_str = ""
 		if isinstance(pin, int):
 			pin_str = f"V{pin}"
@@ -94,7 +101,7 @@ class Blynk:
 		else:
 			pin_str = pin
 		# print(pin_str, self.pin_vals)
-		return self.pin_vals[pin_str]
+		return self.rv_brain_pin_vals[pin_str]
 	
 
 	def run(self):
@@ -103,9 +110,13 @@ class Blynk:
 
 			if (t - self.read_timer) >= self.read_interval:
 				try:
-					vals = self.virtual_read(self.read_pins)
+					vals = self.virtual_read(self.read_rv_brain_pins)
 					if vals != False:
-						self.pin_vals = vals
+						self.rv_brain_pin_vals = vals
+
+					vals = self.virtual_read(self.read_rv_battery_pins)
+					if vals != False:
+						self.rv_battery_pin_vals = vals
 					
 					self.read_timer = t
 					# print(self.pin_vals)
