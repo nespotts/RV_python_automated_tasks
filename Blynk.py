@@ -13,8 +13,12 @@ class Blynk:
 		self.read_interval = 750
 		self.read_timer = 0
 
-	def virtual_write(self, pin, value):
-		url = self.endpoint + "update?token=" + self.rv_brain_token + "&" + str(pin) + "=" + str(value)
+	def virtual_write(self, pin, value, device="rv_brain"):
+		if device == "rv_brain":
+			token = self.rv_brain_token
+		else:
+			token = self.rv_battery_token
+		url = self.endpoint + "update?token=" + token + "&" + str(pin) + "=" + str(value)
 		# print(1)
 		response = requests.get(url=url)
 		# print(2)
@@ -26,8 +30,12 @@ class Blynk:
 		else:
 			return 0
 		
-	def virtual_write_batch(self, pins, values):
-		url = self.endpoint + "batch/update?token=" + self.rv_brain_token
+	def virtual_write_batch(self, pins, values, device="rv_brain"):
+		if device == "rv_brain":
+			token = self.rv_brain_token
+		else:
+			token = self.rv_battery_token
+		url = self.endpoint + "batch/update?token=" + token
 		for i in range(len(pins)):
 			pin_str = ""
 			if isinstance(pins[i], int):
@@ -49,12 +57,16 @@ class Blynk:
 			return 500
 	
 
-	def virtual_read(self, pins):
+	def virtual_read(self, pins, device="rv_brain"):
+		if device == "rv_brain":
+			token = self.rv_brain_token
+		else:
+			token = self.rv_battery_token
 		pin_list = ""
 		for pin in pins:
 			pin_list += "&V" + str(pin)
 
-		url = self.endpoint + "get?token=" + self.rv_brain_token + str(pin_list)
+		url = self.endpoint + "get?token=" + token + str(pin_list)
 		# print(3)
 		try:
 			response = requests.get(url=url, timeout=3)
@@ -101,7 +113,10 @@ class Blynk:
 		else:
 			pin_str = pin
 		# print(pin_str, self.pin_vals)
-		return self.rv_brain_pin_vals[pin_str]
+		if device == "rv_battery":
+			return self.rv_battery_pin_vals[pin_str]
+		else:
+			return self.rv_brain_pin_vals[pin_str]
 	
 
 	def run(self):
@@ -110,11 +125,11 @@ class Blynk:
 
 			if (t - self.read_timer) >= self.read_interval:
 				try:
-					vals = self.virtual_read(self.read_rv_brain_pins)
+					vals = self.virtual_read(self.read_rv_brain_pins, "rv_brain")
 					if vals != False:
 						self.rv_brain_pin_vals = vals
 
-					vals = self.virtual_read(self.read_rv_battery_pins)
+					vals = self.virtual_read(self.read_rv_battery_pins, "rv_battery")
 					if vals != False:
 						self.rv_battery_pin_vals = vals
 					

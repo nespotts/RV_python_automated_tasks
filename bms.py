@@ -25,7 +25,8 @@ class BMS:
 
     def sendToBlynk(self):
         # print(7)
-        self.blynk.virtual_write_batch(['V41','V42', 'V43', 'V44','V45', 'V46'], [self.battery['voltage'], self.battery['current'], self.battery['capacity'], self.battery['state_of_charge'], self.battery['state_of_charge_percent'], self.battery['power']])
+        self.blynk.virtual_write_batch(['V41','V42','V43','V44','V45','V46'], [self.battery['voltage'], self.battery['current'], self.battery['capacity'], self.battery['state_of_charge'], self.battery['state_of_charge_percent'], self.battery['power']], "rv_brain")
+        self.blynk.virtual_write_batch(['V41','V42','V43','V44','V45','V46'], [self.battery['voltage'], self.battery['current'], self.battery['capacity'], self.battery['state_of_charge'], self.battery['state_of_charge_percent'], self.battery['power']], "rv_battery")
         # print(8)
         # print(self.battery)
     

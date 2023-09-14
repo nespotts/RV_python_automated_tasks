@@ -27,7 +27,7 @@ class Automation:
             if (t - self.state_timer) > self.state_interval:
                 self.state_timer = t
                 try:    
-                    automation_en = self.blynk.get_pin_val('V78')
+                    automation_en = self.blynk.get_pin_val('V78', "rv_brain")
                     if automation_en == 1:
                         # self.manage_inverter()
                         # self.manage_water_heater()
@@ -47,9 +47,9 @@ class Automation:
 
 
     def stateMachine(self):
-        schedule = self.blynk.get_pin_val('V77').split("\x00")
-        soc = self.blynk.get_pin_val('V45')
-        soc_range = self.blynk.get_pin_val('V79').split("-")
+        schedule = self.blynk.get_pin_val('V77', "rv_brain").split("\x00")
+        soc = self.blynk.get_pin_val('V45', "rv_brain")
+        soc_range = self.blynk.get_pin_val('V79', "rv_brain").split("-")
 
         min_hour = int(schedule[0]) // 3600
         max_hour = int(schedule[1]) // 3600
@@ -97,8 +97,8 @@ class Automation:
 
 
     def syncState(self):
-        inverter_switch = self.blynk.get_pin_val('V74')
-        water_heater = self.blynk.get_pin_val('V73')
+        inverter_switch = self.blynk.get_pin_val('V74', "rv_brain")
+        water_heater = self.blynk.get_pin_val('V73', "rv_brain")
 
         if inverter_switch == 0 and water_heater == 0:
             self.state = 0
