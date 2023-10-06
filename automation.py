@@ -26,6 +26,7 @@ class Automation:
 
             if (t - self.state_timer) > self.state_interval:
                 self.state_timer = t
+
                 try:    
                     automation_en = self.blynk.get_pin_val('V78', "rv_brain")
                     if automation_en == 1:
@@ -34,6 +35,7 @@ class Automation:
                         self.syncState()
                         self.stateMachine()
                     else:
+                        pass
                         print('automation disabled')
                 except Exception as e:
                     print(e)
@@ -53,7 +55,10 @@ class Automation:
 
         min_hour = int(schedule[0]) // 3600
         max_hour = int(schedule[1]) // 3600
-        inverter_off_hour = 23
+        inverter_off_time = self.blynk.get_pin_val('V5', "rv_brain").split("\x00")
+        inverter_off_hour = int(inverter_off_time[0]) // 3600
+        inverter_off_minute = (int(inverter_off_time[0]) % 3600) // 60
+
 
         soc_turn_on = float(soc_range[1])
         soc_turn_off = float(soc_range[0])
@@ -65,7 +70,7 @@ class Automation:
         match self.state:
             case 0: # inverter & WH off
                 # check if it's time to turn on
-                if (soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour):
+                if (soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour and now.hour < inverter_off_hour):
                     self.state = 1
                     self.blynk.virtual_write('V74', 1)
                     self.inverter_start_timer = time.time() # in seconds
@@ -75,7 +80,7 @@ class Automation:
                     self.state = 2
                     print("Inverter Running")
             case 2: # inverter on, WH off
-                if (soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour):
+                if (soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour and now.hour < inverter_off_hour):
                     self.state = 3
                     self.blynk.virtual_write('V73', 1)
                     print("Turning Water Heater On")
@@ -89,7 +94,8 @@ class Automation:
                     self.state = 2
                     self.blynk.virtual_write('V73', 0)
                     print("Turning Water Heater Off")
-                elif now.hour >= inverter_off_hour:
+                
+                if now.hour >= inverter_off_hour:
                     self.state = 0
                     self.blynk.virtual_write('V73', 0)
                     self.blynk.virtual_write('V74', 0)
@@ -116,4 +122,4 @@ class Automation:
         solar_current = self.solar.solar_data['battery_current']
             
         load_current = solar_current - battery_current
-        res = self.blynk.virtual_write('V72', load_current)
+        res = self.blynk.virtual_write('V72', load_current, "rv_brain")

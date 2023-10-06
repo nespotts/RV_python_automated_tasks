@@ -42,7 +42,8 @@ class BMS:
                     self.sendToBlynk()
                     # print(self.battery)
             except Exception as e:
-                print(e)
+                # print(e)
+                pass
 
     def calcBatteryStats(self):
         self.calcVoltage()
