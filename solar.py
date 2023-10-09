@@ -5,8 +5,9 @@ from Blynk import *
 
 
 class ChargeController:
-    def __init__(self, blynk):
+    def __init__(self, blynk, sms):
         self.blynk = blynk
+        self.sms = sms
         self.COM_port = "/dev/ttyUSB0"
         
         self.read_timer = 0
@@ -39,6 +40,9 @@ class ChargeController:
             'solar_current': 0,
             'solar_power': 0,
         }
+        
+        self.msg_interval = 15 * 60000
+        self.msg_timer = 0
 
     def calc_combined_solar_data(self):
         self.solar_data['battery_current'] = self.calcCombinedBatteryCurrent()
@@ -153,6 +157,11 @@ class ChargeController:
                 time.sleep(0.05)
             except Exception as e:
                 print(e)
+                t = time.time_ns() // 1000000
+                if (t - self.msg_timer) >= self.msg_interval:
+                    self.msg_timer = t
+                    self.sms.send_message(f"Failed to get solar charge controller info from controller {i+1}")
+                
 
         print(self.controllers[0])
         print(self.controllers[1])

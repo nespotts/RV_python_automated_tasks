@@ -1,8 +1,9 @@
 import time
 
 class BMS:
-    def __init__(self, blynk):
+    def __init__(self, blynk, sms):
         self.blynk = blynk
+        self.sms = sms
         self.blynk_bms_pins = {
             'voltage': [5,17,29],
             'current': [6,18,30],
@@ -22,6 +23,9 @@ class BMS:
         }
         self.send_timer = 0
         self.send_interval = 750
+        
+        self.sms_discharge_interval = 60000
+        self.sms_timer = 0
 
     def sendToBlynk(self):
         # print(7)
@@ -41,6 +45,13 @@ class BMS:
                     self.send_timer = t
                     self.sendToBlynk()
                     # print(self.battery)
+                    
+                discharge_status = self.blynk.get_pin_vals(["V8","V20","V32"], "rv_battery")
+                if 0 in discharge_status:
+                    if (t - self.sms_timer) >= self.sms_discharge_interval:
+                        self.sms_timer = t
+                        self.sms.send_message("A battery discharge mosfet is turned off")
+                        
             except Exception as e:
                 # print(e)
                 pass
