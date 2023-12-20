@@ -19,9 +19,9 @@ class ChargeController:
         self.controllers = {}
         self.create_controller_data()
 
-        self.controller1
-        self.controller2
-        self.controller3
+        self.controller1 = 0
+        self.controller2 = 0
+        self.controller3 = 0
         self.controller_efficiency = 0.94
 
         self.blynk_pins = {
@@ -125,11 +125,12 @@ class ChargeController:
                     else:
                         print('not waiting')
                         self.read_timer = t
-                    
+
                 if (t - self.send_timer) >= self.send_interval:
                     self.send_to_Blynk()
                     self.send_timer = t
             except Exception as e:
+                # pass
                 print(e)
 
     def get_charge_controller_info(self):
