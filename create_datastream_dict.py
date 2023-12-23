@@ -36,7 +36,7 @@ class createBlynkDatastreams:
 			datastreams.append(datastream)
 
 
-		# print(datastreams)
+		print(datastreams)
 		return datastreams
      
 
