@@ -1,7 +1,6 @@
-import datetime
+from datetime import datetime
 import time
-import pytz
-
+# import pytz
 
 class Automation:
     def __init__(self, blynk, bms, solar):
@@ -34,11 +33,14 @@ class Automation:
                         print('automation enabled')
                         # self.manage_inverter()
                         # self.manage_water_heater()
+                        # print('a')
                         self.syncState()
+                        # print('b')
                         self.stateMachine()
+                        # print(2)
                     else:
-                        pass
                         print('automation disabled')
+                        pass
                 except Exception as e:
                     print(e)
 
@@ -50,22 +52,28 @@ class Automation:
                     print(e)
 
     def stateMachine(self):
+        # print(4)
         schedule = self.blynk.get_pin_val('V77', "rv_brain").split("\x00")
         soc = self.blynk.get_pin_val('V45', "rv_brain")
         soc_range = self.blynk.get_pin_val('V79', "rv_brain").split("-")
-
+        # print(5)
         min_hour = int(schedule[0]) // 3600
         max_hour = int(schedule[1]) // 3600
         inverter_off_time = self.blynk.get_pin_val('V5', "rv_brain").split("\x00")
         inverter_off_hour = int(inverter_off_time[0]) // 3600
         inverter_off_minute = (int(inverter_off_time[0]) % 3600) // 60
-
+        # print(6)
         soc_turn_on = float(soc_range[1])
         soc_turn_off = float(soc_range[0])
+        # print(7)
+        # utc = datetime.datetime.now()  # UTC
+        # print(8)
+        # eastern = pytz.timezone('US/Eastern')  # eastern timezone info
+        # print(9)
+        # now = utc.astimezone(eastern)
+        now = datetime.now()
+        # print(10)
 
-        utc = datetime.datetime.now()  # UTC
-        eastern = pytz.timezone('US/Eastern')  # eastern timezone info
-        now = utc.astimezone(eastern)
 
         match self.state:
             case 0:  # inverter & WH off

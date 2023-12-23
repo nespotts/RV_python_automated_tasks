@@ -108,12 +108,15 @@ class Blynk:
 			else:
 				pin_str = pin
 			# print(pin_str, self.pin_vals)
-			if device == "rv_battery":
-				output.append(self.rv_battery_pin_vals[pin_str])
-			elif device == "rv_brain":
-				output.append(self.rv_brain_pin_vals[pin_str])
-			else:
-				output.append(self.house_lights_pin_vals[pin_str])
+			try:
+				if device == "rv_battery":
+					output.append(self.rv_battery_pin_vals[pin_str])
+				elif device == "rv_brain":
+					output.append(self.rv_brain_pin_vals[pin_str])
+				else:
+					output.append(self.house_lights_pin_vals[pin_str])
+			except IndexError:
+				return False
 
 		return output
 	
@@ -128,12 +131,18 @@ class Blynk:
 			pin_str = pin
 		# print(pin_str, self.pin_vals)
  
-		if device == "rv_battery":
-			return self.rv_battery_pin_vals[pin_str]
-		elif device == "rv_brain":
-			return self.rv_brain_pin_vals[pin_str]
-		else:
-			return self.house_lights_pin_vals[pin_str]
+		try:
+			if device == "rv_battery":
+				# print(self.rv_battery_pin_vals)
+				return self.rv_battery_pin_vals[pin_str]
+			elif device == "rv_brain":
+				# print(self.rv_brain_pin_vals)
+				return self.rv_brain_pin_vals[pin_str]
+			else:
+				return self.house_lights_pin_vals[pin_str]
+		except IndexError:
+			print(False)
+			return False
 
 
 	def run(self):
