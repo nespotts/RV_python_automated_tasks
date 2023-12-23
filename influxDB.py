@@ -9,7 +9,7 @@ class InfluxDB:
 	# token = os.environ.get("INFLUX_TOKEN")
 	org = "RV"
 	host = "https://us-east-1-1.aws.cloud2.influxdata.com"
-	database = "get-started"
+	database = "Automation"
 	cert = ""
 	client = ""
 	

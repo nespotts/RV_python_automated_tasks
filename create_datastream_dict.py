@@ -23,17 +23,17 @@ class createBlynkDatastreams:
 		soup = BeautifulSoup(html, features="html.parser")
 		rows = soup.select("#datastreams-table > div > div.ant-table-body > table > tbody > tr.ant-table-row")
 
-		datastreams = []
+		datastreams = {}
 		# print(rows)
 		for row in rows:
 			name = row.select_one("td.ant-table-cell.table-cell-name.ant-table-cell-fix-left.ant-table-cell-fix-left-last.ant-table-cell-ellipsis > span > span")
 			pin = row.select_one("td:nth-child(5)")
 			# datastreams.append(name.text)
-			datastream = {
+
+			datastreams[pin.text] = {
 				"name": name.text,
 				"pin": pin.text
 			}
-			datastreams.append(datastream)
 
 
 		print(datastreams)

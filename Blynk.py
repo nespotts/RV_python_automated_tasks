@@ -1,6 +1,7 @@
 import time
 import requests
 from create_datastream_dict import createBlynkDatastreams
+from influxdb_client_3 import Point
 
 class Blynk:
 	def __init__(self, db):
@@ -9,12 +10,12 @@ class Blynk:
 		self.rv_brain_token = "fkY_GzSnp2MVq31eh4iSj6UIne4-RFY0"
 		self.rv_battery_token = "a58EO0MExXyF1byGFDbb-WmtsQw71bdW"
 		self.house_lights_token = "dWl-flniQB-bG9NC7p2hIl-H4OiNUpp7"
-		self.read_rv_brain_pins = [0,1,2,3,4,5,6,7,8,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79]
-		self.read_rv_battery_pins = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]
-		self.read_house_lights_pins = [0,1,2,3]
-		self.rv_brain_pin_vals = {}
-		self.rv_battery_pin_vals = {}
-		self.house_lights_pin_vals = {}
+		# self.read_rv_brain_pins = [0,1,2,3,4,5,6,7,8,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79]
+		# self.read_rv_battery_pins = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]
+		# self.read_house_lights_pins = [0,1,2,3]
+		# self.rv_brain_pin_vals = {}
+		# self.rv_battery_pin_vals = {}
+		# self.house_lights_pin_vals = {}
 		self.read_interval = 750
 		self.read_timer = 0
 		ds = createBlynkDatastreams()
@@ -75,7 +76,7 @@ class Blynk:
 			return 500
 	
 
-	def virtual_read(self, pins, device="rv_brain"):
+	def virtual_read(self, datastreams, device="rv_brain"):
 		if device == "rv_brain":
 			token = self.rv_brain_token
 		elif device == "rv_battery":
@@ -84,10 +85,16 @@ class Blynk:
 			token = self.house_lights_token
    
 		pin_list = ""
-		for pin in pins:
-			pin_list += "&V" + str(pin)
+		# for pin in pins:
+		# 	pin_list += "&V" + str(pin)
+		for pin, props in datastreams.items():
+			pin_list += "&" + pin
+   
+		# print(pin_list)
+			
 
 		url = self.endpoint + "get?token=" + token + str(pin_list)
+		# print(url)
 		# print(3)
 		try:
 			response = requests.get(url=url, timeout=3)
@@ -95,7 +102,18 @@ class Blynk:
 			if status == 200:
 				vals = response.json()
 				# print(vals)
+				vals = {k:v for k,v in vals.items()}
+				# print(vals)
+				# add value to datastreams dict
 				return vals
+				# for dict in self.rv_brain_datastreams:
+				# 	print(dict)
+				# 	dict.val = vals[dict.pin]
+				# print(self.rv_brain_datastreams)
+				# return self.rv_brain_datastreams
+
+				# add vals to datastreams
+				# return vals
 			else:
 				return False
 		except requests.Timeout as e:
@@ -120,11 +138,14 @@ class Blynk:
 			# print(pin_str, self.pin_vals)
 			try:
 				if device == "rv_battery":
-					output.append(self.rv_battery_pin_vals[pin_str])
+					# output.append(self.rv_battery_pin_vals[pin_str])
+					output.append(self.rv_battery_datastreams[pin_str]['val'])
 				elif device == "rv_brain":
-					output.append(self.rv_brain_pin_vals[pin_str])
+					# output.append(self.rv_brain_pin_vals[pin_str])
+					output.append(self.rv_brain_datastreams[pin_str]['val'])
 				else:
-					output.append(self.house_lights_pin_vals[pin_str])
+					# output.append(self.house_lights_pin_vals[pin_str])
+					output.append(self.house_lights_datastreams[pin_str]['val'])
 			except IndexError:
 				return False
 
@@ -144,12 +165,15 @@ class Blynk:
 		try:
 			if device == "rv_battery":
 				# print(self.rv_battery_pin_vals)
-				return self.rv_battery_pin_vals[pin_str]
+				# return self.rv_battery_pin_vals[pin_str]
+				return self.rv_battery_datastreams[pin_str]['val']
 			elif device == "rv_brain":
 				# print(self.rv_brain_pin_vals)
-				return self.rv_brain_pin_vals[pin_str]
+				# return self.rv_brain_pin_vals[pin_str]
+				return self.rv_brain_datastreams[pin_str]['val']
 			else:
-				return self.house_lights_pin_vals[pin_str]
+				# return self.house_lights_pin_vals[pin_str]
+				return self.house_lights_datastreams[pin_str]['val']
 		except IndexError:
 			print(False)
 			return False
@@ -161,20 +185,55 @@ class Blynk:
 
 			if (t - self.read_timer) >= self.read_interval:
 				try:
-					vals = self.virtual_read(self.read_rv_brain_pins, "rv_brain")
+					# vals = self.virtual_read(self.read_rv_brain_pins, "rv_brain")
+					vals = self.virtual_read(self.rv_brain_datastreams, "rv_brain")
 					if vals != False:
-						self.rv_brain_pin_vals = vals
-						# upload data to influxDB
+						data = []
+						for pin,value in vals.items():
+							self.rv_brain_datastreams[pin]['val'] = value
+							column = self.rv_brain_datastreams[pin]['name']
+							table = "rv_brain"
+							point = (
+								Point(table).field(column, value)
+							)
+							data.append(point)
 
-					vals = self.virtual_read(self.read_rv_battery_pins, "rv_battery")
-					if vals != False:
-						self.rv_battery_pin_vals = vals
-						# upload data to influxDB
+						# print(self.rv_brain_datastreams)
+						# print(data)
+						self.db.write(data)
 
-					vals = self.virtual_read(self.read_house_lights_pins, "house_lights")
+
+					vals = self.virtual_read(self.rv_battery_datastreams, "rv_battery")
 					if vals != False:
-						self.house_lights_pins = vals
-						# upload data to influxDB
+						data = []
+						for pin,value in vals.items():
+							self.rv_battery_datastreams[pin]['val'] = value
+							column = self.rv_battery_datastreams[pin]['name']
+							table = "rv_battery"
+							point = (
+								Point(table).field(column, value)
+							)
+							data.append(point)
+
+						# print(self.rv_battery_datastreams)
+						# print(data)
+						self.db.write(data)
+
+					vals = self.virtual_read(self.house_lights_datastreams, "house_lights")
+					if vals != False:
+						data = []
+						for pin,value in vals.items():
+							self.house_lights_datastreams[pin]['val'] = value
+							column = self.house_lights_datastreams[pin]['name']
+							table = "rv_battery"
+							point = (
+								Point(table).field(column, value)
+							)
+							data.append(point)
+
+						# print(self.house_lights_datastreams)
+						# print(data)
+						self.db.write(data)
 						
 					self.read_timer = t
 					# print(self.pin_vals)
