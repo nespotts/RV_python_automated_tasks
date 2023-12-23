@@ -4,8 +4,11 @@ import time
 from text_message import SendMessage
 sms = SendMessage()
 
+from influxDB import InfluxDB
+db = InfluxDB()
+
 from Blynk import Blynk
-blynk = Blynk()
+blynk = Blynk(db)
 
 from bms import BMS
 bms = BMS(blynk, sms)
@@ -30,8 +33,6 @@ def restartThreads(i):
         threads[i] = threading.Thread(target=solar.run, name="Solar")
     elif threads[i].name == "Automation":
         threads[i] = threading.Thread(target=automation.run, name="Automation")
-    # elif threads[i].name == "House Lights":
-    #     threads[i] = threading.Thread(target=house_lights.run, name="House Lights")
 
     try:
         threads[i].start()
@@ -48,7 +49,6 @@ if __name__ == '__main__':
     threads.append(threading.Thread(target=bms.run, name="BMS"))
     threads.append(threading.Thread(target=solar.run, name="Solar"))
     threads.append(threading.Thread(target=automation.run, name="Automation"))
-    # threads.append(threading.Thread(target=house_lights.run, name="House Lights"))
 
     for thread in threads:
         thread.start()

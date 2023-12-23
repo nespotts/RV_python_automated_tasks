@@ -2,7 +2,8 @@ import time
 import requests
 
 class Blynk:
-	def __init__(self):
+	def __init__(self, db):
+		self.db = db
 		self.endpoint = "https://blynk.cloud/external/api/"
 		self.rv_brain_token = "fkY_GzSnp2MVq31eh4iSj6UIne4-RFY0"
 		self.rv_battery_token = "a58EO0MExXyF1byGFDbb-WmtsQw71bdW"
@@ -15,6 +16,13 @@ class Blynk:
 		self.house_lights_pin_vals = {}
 		self.read_interval = 750
 		self.read_timer = 0
+  
+		# generate by running create_datastream_dict.py
+		self.rv_brain_datastreams = [{'name': 'Booster Power', 'pin': 'V0'}, {'name': 'Star Link Power', 'pin': 'V1'}, {'name': 'InternetSchedule', 'pin': 'V2'}, {'name': 'Booster Power Feedback', 'pin': 'V3'}, {'name': 'Starlink Power Feedback', 'pin': 'V4'}, {'name': 'inverter_off_time', 'pin': 'V5'}, {'name': 'inverter_temp', 'pin': 'V6'}, {'name': 'inverter_current', 'pin': 'V7'}, {'name': 'dc_dc_current', 'pin': 'V8'}, {'name': 'battery_voltage', 'pin': 'V41'}, {'name': 'battery_current', 'pin': 'V42'}, {'name': 'battery_capacity', 'pin': 'V43'}, {'name': 'battery_state_of_charge', 'pin': 'V44'}, {'name': 'battery_state_of_charge_percent', 'pin': 'V45'}, {'name': 'battery_power', 'pin': 'V46'}, {'name': 'solar1_voltage', 'pin': 'V47'}, {'name': 'solar1_current', 'pin': 'V48'}, {'name': 'solar1_power', 'pin': 'V49'}, {'name': 'solar1_battery_voltage', 'pin': 'V50'}, {'name': 'solar1_battery_current', 'pin': 'V51'}, {'name': 'solar1_state_of_charge', 'pin': 'V52'}, {'name': 'solar1_controller_temp', 'pin': 'V53'}, {'name': 'solar2_voltage', 'pin': 'V54'}, {'name': 'solar2_current', 'pin': 'V55'}, {'name': 'solar2_power', 'pin': 'V56'}, {'name': 'solar2_battery_voltage', 'pin': 'V57'}, {'name': 'solar2_battery_current', 'pin': 'V58'}, {'name': 'solar2_state_of_charge', 'pin': 'V59'}, {'name': 'solar2_controller_temp', 'pin': 'V60'}, {'name': 'solar3_voltage', 'pin': 'V61'}, {'name': 'solar3_current', 'pin': 'V62'}, {'name': 'solar3_power', 'pin': 'V63'}, {'name': 'solar3_battery_voltage', 'pin': 'V64'}, {'name': 'solar3_battery_current', 'pin': 'V65'}, {'name': 'solar3_state_of_charge', 'pin': 'V66'}, {'name': 'solar3_controller_temp', 'pin': 'V67'}, {'name': 'solar_current', 'pin': 'V68'}, {'name': 'solar_power', 'pin': 'V69'}, {'name': 'solar_battery_current', 'pin': 'V70'}, {'name': 'solar_battery_voltage', 'pin': 'V71'}, {'name': 'load_current', 'pin': 'V72'}, {'name': 'water_heater', 'pin': 'V73'}, {'name': 'inverter', 'pin': 'V74'}, {'name': 'relay3', 'pin': 'V75'}, {'name': 'relay4', 'pin': 'V76'}, {'name': 'automation_active_hours', 'pin': 'V77'}, {'name': 'automation_enable', 'pin': 'V78'}, {'name': 'automation_soc_range', 'pin': 'V79'}]		
+		self.rv_battery_datastreams = [{'name': 'bms1_voltage', 'pin': 'V5'}, {'name': 'bms1_current', 'pin': 'V6'}, {'name': 'bms1_state_of_charge', 'pin': 'V7'}, {'name': 'bms1_discharge_status', 'pin': 'V8'}, {'name': 'bms1_charge_status', 'pin': 'V9'}, {'name': 'bms1_battery_temp', 'pin': 'V10'}, {'name': 'bms1_bms_temp', 'pin': 'V11'}, {'name': 'bms1_balance_capacity', 'pin': 'V12'}, {'name': 'bms1_rate_capacity', 'pin': 'V13'}, {'name': 'bms1_cell1_voltage', 'pin': 'V14'}, {'name': 'bms1_cell2_voltage', 'pin': 'V0'}, {'name': 'bms1_cell3_voltage', 'pin': 'V15'}, {'name': 'bms1_cell4_voltage', 'pin': 'V16'}, {'name': 'bms1_cell1_bal_en', 'pin': 'V1'}, {'name': 'bms1_cell2_bal_en', 'pin': 'V2'}, {'name': 'bms1_cell3_bal_en', 'pin': 'V3'}, {'name': 'bms1_cell4_bal_en', 'pin': 'V4'}, {'name': 'bms1_cycle_count', 'pin': 'V47'}, {'name': 'bms1_fault_count', 'pin': 'V48'}, {'name': 'bms2_voltage', 'pin': 'V17'}, {'name': 'bms2_current', 'pin': 'V18'}, {'name': 'bms2_state_of_charge', 'pin': 'V19'}, {'name': 'bms2_discharge_status', 'pin': 'V20'}, {'name': 'bms2_charge_status', 'pin': 'V21'}, {'name': 'bms2_battery_temp', 'pin': 'V22'}, {'name': 'bms2_bms_temp', 'pin': 'V23'}, {'name': 'bms2_balance_capacity', 'pin': 'V24'}, {'name': 'bms2_rate_capacity', 'pin': 'V25'}, {'name': 'bms2_cell1_voltage', 'pin': 'V49'}, {'name': 'bms2_cell2_voltage', 'pin': 'V50'}, {'name': 'bms2_cell3_voltage', 'pin': 'V51'}, {'name': 'bms2_cell4_voltage', 'pin': 'V52'}, {'name': 'bms2_cell1_bal_en', 'pin': 'V53'}, {'name': 'bms2_cell2_bal_en', 'pin': 'V54'}, {'name': 'bms2_cell3_bal_en', 'pin': 'V55'}, {'name': 'bms2_cell4_bal_en', 'pin': 'V56'}, {'name': 'bms2_cycle_count', 'pin': 'V57'}, {'name': 'bms2_fault_count', 'pin': 'V58'}, {'name': 'bms3_voltage', 'pin': 'V29'}, {'name': 'bms3_current', 'pin': 'V30'}, {'name': 'bms3_state_of_charge', 'pin': 'V31'}, {'name': 'bms3_discharge_status', 'pin': 'V32'}, {'name': 'bms3_charge_status', 'pin': 'V33'}, {'name': 'bms3_battery_temp', 'pin': 'V34'}, {'name': 'bms3_bms_temp', 'pin': 'V35'}, {'name': 'bms3_balance_capacity', 'pin': 'V36'}, {'name': 'bms3_rate_capacity', 'pin': 'V37'}, {'name': 'bms3_cell1_voltage', 'pin': 'V26'}, {'name': 'bms3_cell2_voltage', 'pin': 'V63'}, {'name': 'bms3_cell3_voltage', 'pin': 'V27'}, {'name': 'bms3_cell4_voltage', 'pin': 'V64'}, {'name': 'bms3_cell1_bal_en', 'pin': 'V28'}, {'name': 'bms3_cell2_bal_en', 'pin': 'V65'}, {'name': 'bms3_cell3_bal_en', 'pin': 'V59'}, {'name': 'bms3_cell4_bal_en', 'pin': 'V60'}, {'name': 'bms3_cycle_count', 'pin': 'V61'}, {'name': 'bms3_fault_count', 'pin': 'V62'}, {'name': 'battery_voltage', 'pin': 'V41'}, {'name': 'battery_current', 'pin': 'V42'}, {'name': 'battery_capacity', 'pin': 'V43'}, {'name': 'battery_state_of_charge', 'pin': 'V44'}, {'name': 'battery_state_of_charge_percent', 'pin': 'V45'}, {'name': 'battery_power', 'pin': 'V46'}]
+		self.house_lights_datastreams = [{'name': 'relay1', 'pin': 'V0'}, {'name': 'relay2', 'pin': 'V1'}, {'name': 'relay1_feedback', 'pin': 'V2'}, {'name': 'relay2_feedback', 'pin': 'V3'}]
+
+
 
 	def virtual_write(self, pin, value, device="rv_brain"):
 		if device == "rv_brain":
@@ -155,17 +163,23 @@ class Blynk:
 					vals = self.virtual_read(self.read_rv_brain_pins, "rv_brain")
 					if vals != False:
 						self.rv_brain_pin_vals = vals
+						# upload data to influxDB
 
 					vals = self.virtual_read(self.read_rv_battery_pins, "rv_battery")
 					if vals != False:
 						self.rv_battery_pin_vals = vals
+						# upload data to influxDB
 
 					vals = self.virtual_read(self.read_house_lights_pins, "house_lights")
 					if vals != False:
 						self.house_lights_pins = vals
-					
+						# upload data to influxDB
+						
 					self.read_timer = t
 					# print(self.pin_vals)
+
+
+
 				except Exception as e:
 					print(e)
 
