@@ -26,6 +26,7 @@ class InfluxDB:
 			token=self.token, 
 			org=self.org,
 			database=database,
+			ssl_ca_cert=certifi.where(),
 			flight_client_options=flight_client_options(
 				tls_root_certs=self.cert)
 			)     
