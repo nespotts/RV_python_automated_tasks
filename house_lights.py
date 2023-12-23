@@ -5,8 +5,8 @@ import time
 class HouseLights:
     def __init__(self, blynk):
         self.blynk = blynk
-        self.timer = 0
-        self.interval = 1000
+        self.house_lights_timer = 0
+        self.house_lights_interval = 1000
         
     def run(self):
         while True:
@@ -17,8 +17,8 @@ class HouseLights:
             now = datetime.now()
             t = time.time_ns() // 1000000
 
-            if (t - self.timer) > self.interval:
-                self.timer = t
+            if (t - self.house_lights_timer) > self.house_lights_interval:
+                self.house_lights_timer = t
                 try:
                     # automate house lights
                     if now.hour == 7 and now.minute == 0:

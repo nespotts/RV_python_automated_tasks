@@ -16,11 +16,11 @@ solar = ChargeController(blynk, sms)
 from automation import Automation
 automation = Automation(blynk, bms, solar)
 
-from house_lights import HouseLights
-house_lights = HouseLights(blynk)
+# from house_lights import HouseLights
+# house_lights = HouseLights(blynk)
 
 threads = []
-threads_alive = [1, 1, 1, 1, 1]
+threads_alive = [1, 1, 1, 1]
 
 
 def restartThreads(i):
@@ -33,8 +33,8 @@ def restartThreads(i):
         threads[i] = threading.Thread(target=solar.run, name="Solar")
     elif threads[i].name == "Automation":
         threads[i] = threading.Thread(target=automation.run, name="Automation")
-    elif threads[i].name == "House Lights":
-        threads[i] = threading.Thread(target=house_lights.run, name="House Lights")
+    # elif threads[i].name == "House Lights":
+    #     threads[i] = threading.Thread(target=house_lights.run, name="House Lights")
 
     try:
         threads[i].start()
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     threads.append(threading.Thread(target=bms.run, name="BMS"))
     threads.append(threading.Thread(target=solar.run, name="Solar"))
     threads.append(threading.Thread(target=automation.run, name="Automation"))
-    threads.append(threading.Thread(target=house_lights.run, name="House Lights"))
+    # threads.append(threading.Thread(target=house_lights.run, name="House Lights"))
 
     for thread in threads:
         thread.start()

@@ -17,12 +17,18 @@ class Automation:
         self.load_timer = 0
         self.load_interval = 750
 
+        self.house_lights_timer = 0
+        self.house_lights_interval = 1000
+
+        self.now = datetime.now()
+
     def run(self):
         # if time of day is corrrect a
         # and if battery is above 95%
         # 
         while True:
             t = time.time_ns() // 1000000
+            self.now = datetime.now()
 
             if (t - self.state_timer) > self.state_interval:
                 self.state_timer = t
@@ -51,6 +57,29 @@ class Automation:
                 except Exception as e:
                     print(e)
 
+
+            if (t - self.house_lights_timer) > self.house_lights_interval:
+                self.house_lights_timer = t
+                try:
+                    # automate house lights
+                    if self.now.hour == 7 and self.now.minute == 0:
+                        print("turning house light on")
+                        self.blynk.virtual_write('V1', 0, "house_lights")
+                    elif self.now.hour == 8 and self.now.minute == 0:
+                        print("turning house light off")
+                        self.blynk.virtual_write('V1', 1, "house_lights")
+                    elif self.now.hour == 5 and self.now.minute == 0:
+                        print("turning house light on")
+                        self.blynk.virtual_write('V1', 0, "house_lights")
+                    elif self.now.hour == 8 and self.now.minute == 0:
+                        print("turning house light off")
+                        self.blynk.virtual_write('V1', 1, "house_lights")
+                        
+
+                except Exception as e:
+                    print(e)
+                    # pass
+
     def stateMachine(self):
         # print(4)
         schedule = self.blynk.get_pin_val('V77', "rv_brain").split("\x00")
@@ -71,7 +100,7 @@ class Automation:
         # eastern = pytz.timezone('US/Eastern')  # eastern timezone info
         # print(9)
         # now = utc.astimezone(eastern)
-        now = datetime.now()
+        # self.now = datetime.now()
         # print(10)
 
 
@@ -79,7 +108,7 @@ class Automation:
             case 0:  # inverter & WH off
                 # check if it's time to turn on
                 if (
-                        soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour and now.hour < inverter_off_hour):
+                        soc >= soc_turn_on and self.now.hour >= min_hour and self.now.hour < max_hour and self.now.hour < inverter_off_hour):
                     self.state = 1
                     self.blynk.virtual_write('V74', 1)
                     self.inverter_start_timer = time.time()  # in seconds
@@ -90,22 +119,22 @@ class Automation:
                     print("Inverter Running")
             case 2:  # inverter on, WH off
                 if (
-                        soc >= soc_turn_on and now.hour >= min_hour and now.hour < max_hour and now.hour < inverter_off_hour):
+                        soc >= soc_turn_on and self.now.hour >= min_hour and self.now.hour < max_hour and self.now.hour < inverter_off_hour):
                     self.state = 3
                     self.blynk.virtual_write('V73', 1)
                     print("Turning Water Heater On")
-                elif now.hour >= inverter_off_hour:
+                elif self.now.hour >= inverter_off_hour:
                     self.state = 0
                     self.blynk.virtual_write('V73', 0)
                     self.blynk.virtual_write('V74', 0)
                     print("Turning Inverter Off for the Night")
             case 3:  # inverter & WH on
-                if (soc <= soc_turn_off or now.hour < min_hour or now.hour >= max_hour):
+                if (soc <= soc_turn_off or self.now.hour < min_hour or self.now.hour >= max_hour):
                     self.state = 2
                     self.blynk.virtual_write('V73', 0)
                     print("Turning Water Heater Off")
 
-                if now.hour >= inverter_off_hour:
+                if self.now.hour >= inverter_off_hour:
                     self.state = 0
                     self.blynk.virtual_write('V73', 0)
                     self.blynk.virtual_write('V74', 0)
