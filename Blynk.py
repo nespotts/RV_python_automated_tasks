@@ -7,7 +7,7 @@ class Blynk:
 		self.rv_brain_token = "fkY_GzSnp2MVq31eh4iSj6UIne4-RFY0"
 		self.rv_battery_token = "a58EO0MExXyF1byGFDbb-WmtsQw71bdW"
 		self.house_lights_token = "dWl-flniQB-bG9NC7p2hIl-H4OiNUpp7"
-		self.read_rv_brain_pins = [0,1,2,3,4,5,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79]
+		self.read_rv_brain_pins = [0,1,2,3,4,5,6,7,8,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79]
 		self.read_rv_battery_pins = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40]
 		self.read_house_lights_pins = [0,1,2,3]
 		self.rv_brain_pin_vals = {}
@@ -85,6 +85,7 @@ class Blynk:
 			status = response.status_code
 			if status == 200:
 				vals = response.json()
+				# print(vals)
 				return vals
 			else:
 				return False

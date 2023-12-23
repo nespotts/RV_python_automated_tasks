@@ -16,9 +16,6 @@ solar = ChargeController(blynk, sms)
 from automation import Automation
 automation = Automation(blynk, bms, solar)
 
-# from house_lights import HouseLights
-# house_lights = HouseLights(blynk)
-
 threads = []
 threads_alive = [1, 1, 1, 1]
 

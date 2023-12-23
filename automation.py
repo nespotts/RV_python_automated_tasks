@@ -58,10 +58,10 @@ class Automation:
                     print(e)
 
 
+            # automate house lights
             if (t - self.house_lights_timer) > self.house_lights_interval:
                 self.house_lights_timer = t
                 try:
-                    # automate house lights
                     if self.now.hour == 7 and self.now.minute == 0:
                         print("turning house light on")
                         self.blynk.virtual_write('V1', 0, "house_lights")
