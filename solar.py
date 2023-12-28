@@ -114,25 +114,23 @@ class ChargeController:
 
             try:
                 if (t - self.read_timer) >= self.read_interval:
-                    #  Testing
-                    # print(t)
-                    t=t+1
-                    pass
-                #     self.get_charge_controller_info()
-                #     now = time.time_ns() // 1000000
+                    # testing
+                    # pass
+                    self.get_charge_controller_info()
+                    now = time.time_ns() // 1000000
 
-                #     next_time = t + self.read_interval
-                #     if next_time - now < self.min_read_time_gap:
-                #     # if (now - self.min_read_time_gap - self.read_interval) >= t:
-                #         print('waiting')
-                #         self.read_timer = now + self.min_read_time_gap
-                #     else:
-                #         print('not waiting')
-                #         self.read_timer = t
+                    next_time = t + self.read_interval
+                    if next_time - now < self.min_read_time_gap:
+                    # if (now - self.min_read_time_gap - self.read_interval) >= t:
+                        print('waiting')
+                        self.read_timer = now + self.min_read_time_gap
+                    else:
+                        print('not waiting')
+                        self.read_timer = t
 
-                # if (t - self.send_timer) >= self.send_interval:
-                #     self.send_to_Blynk()
-                #     self.send_timer = t
+                if (t - self.send_timer) >= self.send_interval:
+                    self.send_to_Blynk()
+                    self.send_timer = t
             except Exception as e:
                 # pass
                 print(e)
