@@ -4,8 +4,9 @@ from create_datastream_dict import createBlynkDatastreams
 from influxdb_client_3 import Point
 
 class Blynk:
-	def __init__(self, db):
+	def __init__(self, db, send_to_influx):
 		self.db = db
+		self.send_to_influx = send_to_influx
 		self.endpoint = "https://blynk.cloud/external/api/"
 		self.rv_brain_token = "fkY_GzSnp2MVq31eh4iSj6UIne4-RFY0"
 		self.rv_battery_token = "a58EO0MExXyF1byGFDbb-WmtsQw71bdW"
@@ -198,9 +199,10 @@ class Blynk:
 							)
 							data.append(point)
 
-						# print(self.rv_brain_datastreams)
+						print(self.rv_brain_datastreams)
 						# print(data)
-						self.db.write(data)
+						if self.send_to_influx:
+							self.db.write(data)
 
 
 					vals = self.virtual_read(self.rv_battery_datastreams, "rv_battery")
@@ -215,9 +217,10 @@ class Blynk:
 							)
 							data.append(point)
 
-						# print(self.rv_battery_datastreams)
+						print(self.rv_battery_datastreams)
 						# print(data)
-						self.db.write(data)
+						if self.send_to_influx:
+							self.db.write(data)
 
 					vals = self.virtual_read(self.house_lights_datastreams, "house_lights")
 					if vals != False:
@@ -231,9 +234,10 @@ class Blynk:
 							)
 							data.append(point)
 
-						# print(self.house_lights_datastreams)
+						print(self.house_lights_datastreams)
 						# print(data)
-						self.db.write(data)
+						if self.send_to_influx:
+							self.db.write(data)
 						
 					self.read_timer = t
 					# print(self.pin_vals)
@@ -243,3 +247,10 @@ class Blynk:
 				except Exception as e:
 					print(e)
 
+
+if __name__ == "__main__":
+	from influxDB import InfluxDB
+	db = InfluxDB()
+ 
+	blynk = Blynk(db=db)
+	blynk.run()

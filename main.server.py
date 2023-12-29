@@ -8,31 +8,17 @@ from influxDB import InfluxDB
 db = InfluxDB()
 
 from Blynk import Blynk
-blynk = Blynk(db, False)
+blynk = Blynk(db, True)
 
-from bms import BMS
-bms = BMS(blynk, sms)
-
-from solar import ChargeController
-solar = ChargeController(blynk, sms)
-
-from automation import Automation
-automation = Automation(blynk, bms, solar)
 
 threads = []
-threads_alive = [1, 1, 1, 1]
+threads_alive = [1]
 
 
 def restartThreads(i):
 	print(f"Restarting {threads[i].name}")
 	if threads[i].name == "Blynk":
 		threads[i] = threading.Thread(target=blynk.run, name="Blynk")
-	elif threads[i].name == "BMS":
-		threads[i] = threading.Thread(target=bms.run, name="BMS")
-	elif threads[i].name == "Solar":
-		threads[i] = threading.Thread(target=solar.run, name="Solar")
-	elif threads[i].name == "Automation":
-		threads[i] = threading.Thread(target=automation.run, name="Automation")
 
 	try:
 		threads[i].start()
@@ -46,9 +32,6 @@ def restartThreads(i):
 
 if __name__ == '__main__':
 	threads.append(threading.Thread(target=blynk.run, name="Blynk"))
-	threads.append(threading.Thread(target=bms.run, name="BMS"))
-	threads.append(threading.Thread(target=solar.run, name="Solar"))
-	threads.append(threading.Thread(target=automation.run, name="Automation"))
 
 	for thread in threads:
 		thread.start()
