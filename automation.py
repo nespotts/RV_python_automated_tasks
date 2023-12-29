@@ -54,6 +54,7 @@ class Automation:
                 self.load_timer = t
                 try:
                     self.calc_load_current()
+                    print("Calculating Load")
                 except Exception as e:
                     print(e)
 

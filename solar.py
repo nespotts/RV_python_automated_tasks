@@ -115,6 +115,7 @@ class ChargeController:
                 if (t - self.read_timer) >= self.read_interval:
                     # testing
                     # pass
+                    print("Getting Solar Info")
                     self.get_charge_controller_info()
                     now = time.time_ns() // 1000000
 
@@ -165,9 +166,9 @@ class ChargeController:
                     self.sms.send_message(f"Failed to get solar charge controller info from controller {i+1}")
                 
 
-        print(self.controllers[0])
-        print(self.controllers[1])
-        print(self.controllers[2])
+        # print(self.controllers[0])
+        # print(self.controllers[1])
+        # print(self.controllers[2])
 
 
 

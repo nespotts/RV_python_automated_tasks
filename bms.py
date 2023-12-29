@@ -41,6 +41,7 @@ class BMS:
 
             try:
                 if (t - self.send_timer) >= self.send_interval:
+                    print("Calculating Battery Totals")
                     self.calcBatteryStats()
                     self.send_timer = t
                     self.sendToBlynk()
