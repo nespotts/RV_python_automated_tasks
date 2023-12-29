@@ -245,7 +245,7 @@ class Blynk:
 					self.read_timer = t
 					# print(self.pin_vals)
 
-
+					print("Read Blynk Values")
 
 				except Exception as e:
 					print(e)
@@ -255,5 +255,5 @@ if __name__ == "__main__":
 	from influxDB import InfluxDB
 	db = InfluxDB()
  
-	blynk = Blynk(db=db)
+	blynk = Blynk(db=db, send_to_influx=True)
 	blynk.run()
