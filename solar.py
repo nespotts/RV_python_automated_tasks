@@ -17,11 +17,11 @@ class ChargeController:
         self.send_interval = 1000
 
         self.controllers = {}
+        self.controller1 = None
+        self.controller2 = None
+        self.controller3 = None
         self.create_controller_data()
 
-        self.controller1
-        self.controller2
-        self.controller3
         self.controller_efficiency = 0.94
 
         self.blynk_pins = {
@@ -43,6 +43,18 @@ class ChargeController:
         
         self.msg_interval = 15 * 60000
         self.msg_timer = 0
+        
+    def create_controller_data(self):
+        # self.controller_data = {addr: {} for position: addr in self.controller_addresses}
+        try:
+            self.controller1 = RenogyChargeController(self.COM_port, 17)
+            self.controller2 = RenogyChargeController(self.COM_port, 18)
+            self.controller3 = RenogyChargeController(self.COM_port, 16)
+            self.controllers = [{}, {}, {}]
+        except Exception as e:
+            print(e)
+
+        # print(self.controllers)
 
     def calc_combined_solar_data(self):
         self.solar_data['battery_current'] = self.calcCombinedBatteryCurrent()
@@ -74,19 +86,6 @@ class ChargeController:
         for controller in self.controllers:
             sum += controller['battery_voltage']
         return round(sum/3, 3)
-
-    def create_controller_data(self):
-        # self.controller_data = {addr: {} for position: addr in self.controller_addresses}
-        try:
-            self.controller1 = RenogyChargeController(self.COM_port, 17)
-            self.controller2 = RenogyChargeController(self.COM_port, 18)
-            self.controller3 = RenogyChargeController(self.COM_port, 16)
-            self.controllers = [{}, {}, {}]
-        except Exception as e:
-            print(e)
-
-        # print(self.controllers)
-
 
     def send_to_Blynk(self):
         # blynk.virtual_write_batch()
