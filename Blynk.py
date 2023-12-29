@@ -194,12 +194,13 @@ class Blynk:
 							self.rv_brain_datastreams[pin]['val'] = value
 							column = self.rv_brain_datastreams[pin]['name']
 							table = "rv_brain"
-							point = (
-								Point(table).field(column, value)
-							)
-							data.append(point)
+							if self.send_to_influx:
+								point = (
+									Point(table).field(column, value)
+								)
+								data.append(point)								
 
-						print(self.rv_brain_datastreams)
+						# print(self.rv_brain_datastreams)
 						# print(data)
 						if self.send_to_influx:
 							self.db.write(data)
@@ -212,12 +213,13 @@ class Blynk:
 							self.rv_battery_datastreams[pin]['val'] = value
 							column = self.rv_battery_datastreams[pin]['name']
 							table = "rv_battery"
-							point = (
-								Point(table).field(column, value)
-							)
-							data.append(point)
+							if self.send_to_influx:
+								point = (
+									Point(table).field(column, value)
+								)
+								data.append(point)	
 
-						print(self.rv_battery_datastreams)
+						# print(self.rv_battery_datastreams)
 						# print(data)
 						if self.send_to_influx:
 							self.db.write(data)
@@ -229,12 +231,13 @@ class Blynk:
 							self.house_lights_datastreams[pin]['val'] = value
 							column = self.house_lights_datastreams[pin]['name']
 							table = "rv_battery"
-							point = (
-								Point(table).field(column, value)
-							)
-							data.append(point)
+							if self.send_to_influx:
+								point = (
+									Point(table).field(column, value)
+								)
+								data.append(point)	
 
-						print(self.house_lights_datastreams)
+						# print(self.house_lights_datastreams)
 						# print(data)
 						if self.send_to_influx:
 							self.db.write(data)
