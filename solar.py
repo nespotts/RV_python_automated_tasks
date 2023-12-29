@@ -19,9 +19,9 @@ class ChargeController:
         self.controllers = {}
         self.create_controller_data()
 
-        self.controller1 = 0
-        self.controller2 = 0
-        self.controller3 = 0
+        self.controller1
+        self.controller2
+        self.controller3
         self.controller_efficiency = 0.94
 
         self.blynk_pins = {
