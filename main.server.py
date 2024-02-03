@@ -7,7 +7,7 @@ sms = SendMessage()
 from influxDB import InfluxDB
 db = InfluxDB()
 
-from Blynk import Blynk
+from Blynk import Blynk   
 blynk = Blynk(db, True)
 
 
