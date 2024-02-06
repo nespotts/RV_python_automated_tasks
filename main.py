@@ -55,6 +55,7 @@ if __name__ == '__main__':
 
 	while True:
 		# control what happens when thread stops running for any reason
+		# print(threads_alive)
 		for i in range(0, len(threads)):
 			if threads_alive[i] == 1 and not threads[i].is_alive():
 				threads_alive[i] = 0

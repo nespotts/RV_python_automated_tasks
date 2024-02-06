@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import time
 # import pytz
 
@@ -20,7 +20,9 @@ class Automation:
         self.house_lights_timer = 0
         self.house_lights_interval = 1000
 
-        self.now = datetime.now()
+        # setup timezone hours offset
+        self.tz = timezone(timedelta(hours=-5))
+        self.now = datetime.now(self.tz)
 
     def run(self):
         # if time of day is corrrect a
@@ -28,7 +30,7 @@ class Automation:
         # 
         while True:
             t = time.time_ns() // 1000000
-            self.now = datetime.now()
+            self.now = datetime.now(self.tz)
 
             if (t - self.state_timer) > self.state_interval:
                 self.state_timer = t
