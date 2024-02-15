@@ -16,6 +16,9 @@ class Automation:
 
         self.load_timer = 0
         self.load_interval = 750
+        
+        self.fan_timer = 0
+        self.fan_interval = 750
 
         self.house_lights_timer = 0
         self.house_lights_interval = 1000
@@ -59,7 +62,16 @@ class Automation:
                     print("Calculating Load")
                 except Exception as e:
                     print(e)
-
+                    
+            # add automation for solar fans and exhaust fan
+            if (t - self.fan_timer) > self.fan_interval:
+                self.fan_timer = t
+                try:
+                    # get max of the solar controller temperatures
+                    self.controlSolarFan(self)
+                    
+                except Exception as e:
+                    print(e)
 
             # automate house lights
             if (t - self.house_lights_timer) > self.house_lights_interval:
@@ -82,6 +94,15 @@ class Automation:
                 except Exception as e:
                     print(e)
                     # pass
+                    
+                    
+    def controlSolarFan(self):
+        temp1 = self.blynk.get_pin_val('V53', "rv_brain")
+        temp2 = self.blynk.get_pin_val('V60', "rv_brain")
+        temp3 = self.blynk.get_pin_val('V67', "rv_brain")
+        
+        print(temp1, temp2, temp3)
+    
 
     def stateMachine(self):
         # print(4)
