@@ -68,8 +68,8 @@ class Automation:
                 self.fan_timer = t
                 try:
                     # get max of the solar controller temperatures
-                    self.controlSolarFan(self)
-                    
+                    self.controlSolarFan()
+                    self.controlExhaustFan()                    
                 except Exception as e:
                     print(e)
 
@@ -97,11 +97,37 @@ class Automation:
                     
                     
     def controlSolarFan(self):
+        fan_temp = 115.0
+        temp_deadband = 1
+        
         temp1 = self.blynk.get_pin_val('V53', "rv_brain")
         temp2 = self.blynk.get_pin_val('V60', "rv_brain")
         temp3 = self.blynk.get_pin_val('V67', "rv_brain")
+        current_fan_state = self.blynk.get_pin_val('V75', "rv_brain")
         
-        print(temp1, temp2, temp3)
+        max_temp = max([temp1, temp2, temp3])
+        
+        if max_temp >= (fan_temp + temp_deadband) and current_fan_state == 0:
+            print("Turning on solar fans")
+            self.blynk.virtual_write('V75', 1, "rv_brain")
+        elif max_temp < (fan_temp - temp_deadband) and current_fan_state == 1:
+            print("Turning Off solar fans")
+            self.blynk.virtual_write('V75', 0, "rv_brain")
+            
+            
+    def controlExhaustFan(self):
+        fan_temp = 90.0
+        temp_deadband = 1
+        
+        electrical_temp = self.blynk.get_pin_val('V11', "rv_brain")
+        current_fan_state = self.blynk.get_pin_val('V76', "rv_brain")
+        
+        if electrical_temp >= (fan_temp + temp_deadband) and current_fan_state == 0:
+            print("Turning on exhaust fan")
+            self.blynk.virtual_write('V76', 1, "rv_brain")
+        elif electrical_temp < (fan_temp - temp_deadband) and current_fan_state == 1:
+            print("Turning Off exhaust fan")
+            self.blynk.virtual_write('V76', 0, "rv_brain")
     
 
     def stateMachine(self):

@@ -43,3 +43,7 @@ class createBlynkDatastreams:
 
 
 # print(response.text)
+
+if __name__ == "__main__":
+  d = createBlynkDatastreams()
+  d.process_html(1)
