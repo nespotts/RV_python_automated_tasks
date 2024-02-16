@@ -210,5 +210,10 @@ class Automation:
         dc_dc_current = self.blynk.get_pin_val('V8', "rv_brain")
         inv_current = self.blynk.get_pin_val('V7', "rv_brain")
 
-        load_current = solar_current + dc_dc_current + inv_current - battery_current
+        # bucket inverter current as a dc load when it is not charging
+        if (inv_current < 0):
+            load_current = solar_current + dc_dc_current - battery_current
+        else:
+            load_current = solar_current + dc_dc_current + inv_current - battery_current
+            
         res = self.blynk.virtual_write('V72', load_current, "rv_brain")
