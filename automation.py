@@ -208,6 +208,7 @@ class Automation:
         battery_current = self.bms.battery['current']
         solar_current = self.solar.solar_data['battery_current']
         dc_dc_current = self.blynk.get_pin_val('V8', "rv_brain")
+        inv_current = self.blynk.get_pin_val('V7', "rv_brain")
 
-        load_current = solar_current + dc_dc_current - battery_current
+        load_current = solar_current + dc_dc_current + inv_current - battery_current
         res = self.blynk.virtual_write('V72', load_current, "rv_brain")
