@@ -192,9 +192,10 @@ class Blynk:
 						data = []
 						for pin,value in vals.items():
 							self.rv_brain_datastreams[pin]['val'] = value
-							column = self.rv_brain_datastreams[pin]['name']
-							table = "rv_brain"
 							if self.send_to_influx:
+								column = self.rv_brain_datastreams[pin]['name']
+								column = "dc_dc_currentF" if column == "dc_dc_current" else column
+								table = "rv_brain"
 								point = (
 									Point(table).field(column, value)
 								)
@@ -211,9 +212,9 @@ class Blynk:
 						data = []
 						for pin,value in vals.items():
 							self.rv_battery_datastreams[pin]['val'] = value
-							column = self.rv_battery_datastreams[pin]['name']
-							table = "rv_battery"
 							if self.send_to_influx:
+								column = self.rv_battery_datastreams[pin]['name']
+								table = "rv_battery"
 								point = (
 									Point(table).field(column, value)
 								)
