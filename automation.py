@@ -116,16 +116,16 @@ class Automation:
             
             
     def controlExhaustFan(self):
-        fan_temp = 90.0
-        temp_deadband = 1
+        on_temp = 92.0
+        off_temp = 85.0
         
         electrical_temp = self.blynk.get_pin_val('V11', "rv_brain")
         current_fan_state = self.blynk.get_pin_val('V76', "rv_brain")
         
-        if electrical_temp >= (fan_temp + temp_deadband) and current_fan_state == 0:
+        if electrical_temp >= on_temp and current_fan_state == 0:
             print("Turning on exhaust fan")
             self.blynk.virtual_write('V76', 1, "rv_brain")
-        elif electrical_temp < (fan_temp - temp_deadband) and current_fan_state == 1:
+        elif electrical_temp <= off_temp and current_fan_state == 1:
             print("Turning Off exhaust fan")
             self.blynk.virtual_write('V76', 0, "rv_brain")
     
