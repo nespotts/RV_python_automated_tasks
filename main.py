@@ -1,8 +1,11 @@
 import threading
 import time
 
-from text_message import SendMessage
-sms = SendMessage()
+# from text_message import SendMessage
+# sms = SendMessage()
+
+from notification_manager import NotificationManager
+nm = NotificationManager()
 
 from influxDB import InfluxDB
 db = InfluxDB()
@@ -11,13 +14,13 @@ from Blynk import Blynk
 blynk = Blynk(db, False)
 
 from bms import BMS
-bms = BMS(blynk, sms)
+bms = BMS(blynk, nm)
 
 from solar import ChargeController
-solar = ChargeController(blynk, sms)
+solar = ChargeController(blynk, nm)
 
 from automation import Automation
-automation = Automation(blynk, bms, solar)
+automation = Automation(blynk, bms, solar, nm)
 
 threads = []
 threads_alive = [1, 1, 1, 1]
@@ -59,7 +62,7 @@ if __name__ == '__main__':
 		for i in range(0, len(threads)):
 			if threads_alive[i] == 1 and not threads[i].is_alive():
 				threads_alive[i] = 0
-				sms.send_message(f"{threads[i].name} thread stopped running")
+				nm.send_message(f"{threads[i].name} thread stopped running")
 
 			elif not threads[i].is_alive():
 				restartThreads(i)

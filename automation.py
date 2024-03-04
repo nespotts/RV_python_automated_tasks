@@ -3,10 +3,11 @@ import time
 # import pytz
 
 class Automation:
-    def __init__(self, blynk, bms, solar):
+    def __init__(self, blynk, bms, solar, nm):
         self.blynk = blynk
         self.bms = bms
         self.solar = solar
+        self.nm = nm
         self.water_heater_state = 0  # 0-off 3-on
         self.inverter_state = 0  # 0-off 1-starting 2-waiting on inverter 3-on
         self.state = 0  # 0-inverter & WH off, 1-invert on WH off, 2-inverter on WH on, 3-inverter starting
@@ -109,9 +110,11 @@ class Automation:
         
         if max_temp >= (fan_temp + temp_deadband) and current_fan_state == 0:
             print("Turning on solar fans")
+            # self.nm.send_message("Turning on solar fan")
             self.blynk.virtual_write('V75', 1, "rv_brain")
         elif max_temp < (fan_temp - temp_deadband) and current_fan_state == 1:
             print("Turning Off solar fans")
+            # self.nm.send_message("Turning off solar fan")
             self.blynk.virtual_write('V75', 0, "rv_brain")
             
             

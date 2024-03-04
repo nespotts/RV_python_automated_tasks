@@ -5,9 +5,9 @@ from Blynk import *
 
 
 class ChargeController:
-    def __init__(self, blynk, sms):
+    def __init__(self, blynk, nm):
         self.blynk = blynk
-        self.sms = sms
+        self.nm = nm
         self.COM_port = "/dev/ttyUSB0"
         
         self.read_timer = 0
@@ -163,7 +163,7 @@ class ChargeController:
                 t = time.time_ns() // 1000000
                 if (t - self.msg_timer) >= self.msg_interval:
                     self.msg_timer = t
-                    self.sms.send_message(f"Failed to get solar charge controller info from controller {i+1}")
+                    self.nm.send_message(f"Failed to get solar charge controller info from controller {i+1}")
                 
 
         # print(self.controllers[0])

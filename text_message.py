@@ -32,3 +32,5 @@ if __name__ == "__main__":
     sms = SendMessage()
 
     sms.send_message("Test text message")
+    
+    
