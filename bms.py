@@ -21,6 +21,24 @@ class BMS:
             'capacity': 0,
             'power': 0,
         }
+        self.cell_voltages = [
+            {
+                "cells": [14,0,15,16],
+                "delta_pin": 38,
+                "delta": 0
+                
+            },
+            {
+                "cells": [49,50,51,52],
+                "delta_pin": 39,
+                "delta": 0
+            },
+            {
+                "cells": [26,63,27,64],
+                "delta_pin": 40,
+                "delta": 0
+            }
+        ]
         self.send_timer = 0
         self.send_interval = 750
         
@@ -33,6 +51,7 @@ class BMS:
         self.blynk.virtual_write_batch(['V41','V42','V43','V44','V45','V46'], [self.battery['voltage'], self.battery['current'], self.battery['capacity'], self.battery['state_of_charge'], self.battery['state_of_charge_percent'], self.battery['power']], "rv_battery")
         # print(8)
         # print(self.battery)
+        self.blynk.virtual_write_batch(['V38','V39','V40'], [self.cell_voltages[0]["delta"], self.cell_voltages[1]["delta"], self.cell_voltages[2]["delta"]], "rv_battery")
     
 
     def run(self):
@@ -64,6 +83,20 @@ class BMS:
         self.calcStateOfChargePercent()
         self.calcBatteryCapacity()
         self.calcBatteryPower()
+        self.calcMaxCellDeltas()
+        
+    def calcMaxCellDeltas(self):
+        # loop thru batteries
+        # find difference between max and min cell voltages
+        
+        for battery in self.cell_voltages:
+            voltages = self.blynk.get_pin_vals(battery["cells"], "rv_battery")
+            # print(voltages)
+            battery["delta"] = round(max(voltages) - min(voltages), 3)
+            # print(battery["delta"])
+            
+            
+                
 
     def calcVoltage(self):
         voltages = self.blynk.get_pin_vals(self.blynk_bms_pins['voltage'], "rv_battery")
