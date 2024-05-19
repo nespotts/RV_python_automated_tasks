@@ -119,8 +119,8 @@ class Automation:
             
             
     def controlExhaustFan(self):
-        on_temp = 90.0
-        off_temp = 85.0
+        on_temp = 95.0 #test
+        off_temp = 88.0
         
         electrical_temp = self.blynk.get_pin_val('V11', "rv_brain")
         current_fan_state = self.blynk.get_pin_val('V76', "rv_brain")
