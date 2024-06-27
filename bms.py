@@ -5,13 +5,13 @@ class BMS:
         self.blynk = blynk
         self.nm = nm
         self.blynk_bms_pins = {
-            'voltage': [5,17,29],
-            'current': [6,18,30],
-            'state_of_charge_percent': [7,19,31],
+            'voltage': [5,17,5],#[5,17,29],
+            'current': [6,18,6],#[6,18,30],
+            'state_of_charge_percent': [7,19,7],#[7,19,31],
             'discharge_status': [8,20,32],
             'charge_status': [9,21,33],
-            'state_of_charge': [12,24,36],
-            'capacity': [13,25,37]
+            'state_of_charge': [12,24,12],#[12,24,36],
+            'capacity': [13,25,13]#[13,25,37]
         }
         self.battery = {
             'voltage': 0,
